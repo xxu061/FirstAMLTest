@@ -4,6 +4,6 @@ namespace FIrstAML.Lib
 {
     public interface IParcelPriceCalculator
     {
-        Parcel ProcessParcel(Parcel parcel);
+        Parcel HydrateParcelItem(Parcel parcel);
     }
 }

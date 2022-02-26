@@ -18,7 +18,7 @@ namespace FIrstAML.Lib
             _config = config ?? throw new ArgumentNullException();
         }
 
-        public Parcel ProcessParcel(Parcel parcel)
+        public Parcel HydrateParcelItem(Parcel parcel)
         {
             try
             {
@@ -30,6 +30,11 @@ namespace FIrstAML.Lib
 
                 parcel.Size = CalculateSize(parcel);
                 parcel.Price = CalculatePrice(parcel.Size);
+                if (parcel.Speedy)
+                {
+                    parcel.SpeedyCost = CalculateSpeedyCost(parcel);
+                }
+                parcel.TotalPrice = parcel.Price + (parcel.Speedy ? parcel.SpeedyCost : 0);
 
                 return parcel;
             }
@@ -87,6 +92,10 @@ namespace FIrstAML.Lib
         private bool ValidateParcel(Parcel parcel)
         {
             return !(parcel == null || parcel.Height <= 0 || parcel.Width <= 0 || parcel.Length <= 0);
+        }
+        private decimal CalculateSpeedyCost(Parcel parcel)
+        {
+            return parcel.Price;
         }
     }
 }

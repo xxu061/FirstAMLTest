@@ -9,5 +9,8 @@ namespace FirstAML.Domain
         public double Length { get; set; }
         public ParcelSize Size { get; set; }
         public decimal Price { get; set; }
+        public bool Speedy { get; set; }
+        public decimal SpeedyCost { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }
