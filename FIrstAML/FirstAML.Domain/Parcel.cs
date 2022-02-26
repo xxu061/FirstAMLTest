@@ -12,5 +12,6 @@ namespace FirstAML.Domain
         public bool Speedy { get; set; }
         public decimal SpeedyCost { get; set; }
         public decimal TotalPrice { get; set; }
+        public decimal Weight { get; set; }
     }
 }

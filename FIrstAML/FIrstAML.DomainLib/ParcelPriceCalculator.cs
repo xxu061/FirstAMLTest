@@ -29,7 +29,7 @@ namespace FIrstAML.Lib
                 }
 
                 parcel.Size = CalculateSize(parcel);
-                parcel.Price = CalculatePrice(parcel.Size);
+                parcel.Price = CalculatePrice(parcel.Size, parcel.Weight);
                 if (parcel.Speedy)
                 {
                     parcel.SpeedyCost = CalculateSpeedyCost(parcel);
@@ -74,18 +74,27 @@ namespace FIrstAML.Lib
             }
         }
 
-        private decimal CalculatePrice(ParcelSize size)
+        private decimal CalculatePrice(ParcelSize size, decimal weight)
         {
             decimal price = 0;
-            string priceInConfig = _config[string.Format("{0}SizePrice", size)];
+            decimal sizePrice = GetConfigValue(_config[string.Format("{0}SizePrice", size)]);
+            decimal weightLimit = GetConfigValue(_config[string.Format("{0}WeightLimit", size)]);
 
-            if (!string.IsNullOrEmpty(priceInConfig) && decimal.TryParse(priceInConfig, out price))
+            price += sizePrice;
+            price += CalculateWeightPrice(weightLimit, weight);
+
+            return price;
+        }
+
+        private decimal GetConfigValue(string value)
+        {
+            if (!string.IsNullOrEmpty(value) && decimal.TryParse(value, out decimal result))
             {
-                return price;
+                return result;
             }
             else
             {
-                throw new ArgumentException("Invalid config for parcel price");
+                throw new ArgumentException("Invalid config for " + value);
             }
         }
 
@@ -96,6 +105,18 @@ namespace FIrstAML.Lib
         private decimal CalculateSpeedyCost(Parcel parcel)
         {
             return parcel.Price;
+        }
+
+        private decimal CalculateWeightPrice(decimal weightLimit, decimal weight)
+        {
+            if(weight > weightLimit)
+            {
+                return (weight - weightLimit) * 2;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
