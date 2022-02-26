@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FIrstAML.Lib
 {
@@ -13,7 +14,7 @@ namespace FIrstAML.Lib
         {
             _parcelCalculator = parcelCalculator;
         }
-        public Order GetOrder(IList<Parcel> items)
+        public async Task<Order> GetOrder(IList<Parcel> items)
         {
             if (items == null || !items.Any())
             {
@@ -21,10 +22,14 @@ namespace FIrstAML.Lib
             }
 
             Order order = new Order() { Parcels = new List<Parcel>() };
+
+            var tasks = new List<Task<Parcel>>();
             foreach(var item in items)
             {
-                order.Parcels.Add(_parcelCalculator.HydrateParcelItem(item));
+                tasks.Add(_parcelCalculator.HydrateParcelItem(item));
             }
+
+            order.Parcels = await Task.WhenAll(tasks);
 
             order.Cost = order.Parcels.Sum(p => p.TotalPrice);
 

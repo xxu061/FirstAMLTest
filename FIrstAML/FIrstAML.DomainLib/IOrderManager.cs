@@ -1,10 +1,11 @@
 ﻿using FirstAML.Domain;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FIrstAML.Lib
 {
     public interface IOrderManager
     {
-        Order GetOrder(IList<Parcel> items);
+        Task<Order> GetOrder(IList<Parcel> items);
     }
 }

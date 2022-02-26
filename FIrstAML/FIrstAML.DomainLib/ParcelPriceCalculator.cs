@@ -1,6 +1,7 @@
 ﻿using FirstAML.Domain;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Threading.Tasks;
 
 namespace FIrstAML.Lib
 {
@@ -18,23 +19,28 @@ namespace FIrstAML.Lib
             _config = config ?? throw new ArgumentNullException();
         }
 
-        public Parcel HydrateParcelItem(Parcel parcel)
+        public async Task<Parcel> HydrateParcelItem(Parcel parcel)
         {
             try
             {
-                if (!ValidateParcel(parcel))
+                await Task.Run(() =>
                 {
-                    //We should log more details about the parcel
-                    throw new NullReferenceException("Invalid parcel payload");
-                }
+                    if (!ValidateParcel(parcel))
+                    {
+                        //We should log more details about the parcel
+                        throw new NullReferenceException("Invalid parcel payload");
+                    }
 
-                parcel.Size = CalculateSize(parcel);
-                parcel.Price = CalculatePrice(parcel.Size, parcel.Weight, parcel.Heavy);
-                if (parcel.Speedy)
-                {
-                    parcel.SpeedyCost = CalculateSpeedyCost(parcel);
-                }
-                parcel.TotalPrice = parcel.Price + (parcel.Speedy ? parcel.SpeedyCost : 0);
+                    parcel.Size = CalculateSize(parcel);
+                    parcel.Price = CalculatePrice(parcel.Size, parcel.Weight, parcel.Heavy);
+                    if (parcel.Speedy)
+                    {
+                        parcel.SpeedyCost = CalculateSpeedyCost(parcel);
+                    }
+                    parcel.TotalPrice = parcel.Price + (parcel.Speedy ? parcel.SpeedyCost : 0);
+
+                    
+                });
 
                 return parcel;
             }
