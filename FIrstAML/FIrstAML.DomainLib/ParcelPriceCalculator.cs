@@ -4,7 +4,7 @@ using System;
 
 namespace FIrstAML.Lib
 {
-    public class ParcelPriceCalculator: IParcelPriceCalculator
+    public class ParcelPriceCalculator : IParcelPriceCalculator
     {
         private readonly IConfiguration _config;
         /// <summary>
@@ -29,7 +29,7 @@ namespace FIrstAML.Lib
                 }
 
                 parcel.Size = CalculateSize(parcel);
-                parcel.Price = CalculatePrice(parcel.Size, parcel.Weight);
+                parcel.Price = CalculatePrice(parcel.Size, parcel.Weight, parcel.Heavy);
                 if (parcel.Speedy)
                 {
                     parcel.SpeedyCost = CalculateSpeedyCost(parcel);
@@ -38,7 +38,7 @@ namespace FIrstAML.Lib
 
                 return parcel;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
@@ -51,11 +51,11 @@ namespace FIrstAML.Lib
         /// <returns></returns>
         private ParcelSize CalculateSize(Parcel parcel)
         {
-            if(parcel.Height <= _smallSizeInCm && parcel.Length <= _smallSizeInCm && parcel.Width <= _smallSizeInCm)
+            if (parcel.Height <= _smallSizeInCm && parcel.Length <= _smallSizeInCm && parcel.Width <= _smallSizeInCm)
             {
                 return ParcelSize.Small;
             }
-            else if(parcel.Height <= _mediumSizeInCm && parcel.Length <= _mediumSizeInCm && parcel.Width <= _mediumSizeInCm)
+            else if (parcel.Height <= _mediumSizeInCm && parcel.Length <= _mediumSizeInCm && parcel.Width <= _mediumSizeInCm)
             {
                 return ParcelSize.Medium;
             }
@@ -63,25 +63,25 @@ namespace FIrstAML.Lib
             {
                 return ParcelSize.Large;
             }
-            else if(parcel.Height > _largeSizeInCm || parcel.Width > _largeSizeInCm || parcel.Length > _largeSizeInCm)
+            else if (parcel.Height > _largeSizeInCm || parcel.Width > _largeSizeInCm || parcel.Length > _largeSizeInCm)
             {
                 return ParcelSize.ExtraLarge;
             }
             else
             {
-                throw new ArgumentException(string.Format("Cannot determine parcel size: height {0}, width {1}, length {2}", 
+                throw new ArgumentException(string.Format("Cannot determine parcel size: height {0}, width {1}, length {2}",
                     parcel.Height, parcel.Width, parcel.Length));
             }
         }
 
-        private decimal CalculatePrice(ParcelSize size, decimal weight)
+        private decimal CalculatePrice(ParcelSize size, decimal weight, bool heavy)
         {
             decimal price = 0;
             decimal sizePrice = GetConfigValue(_config[string.Format("{0}SizePrice", size)]);
             decimal weightLimit = GetConfigValue(_config[string.Format("{0}WeightLimit", size)]);
 
             price += sizePrice;
-            price += CalculateWeightPrice(weightLimit, weight);
+            price += CalculateWeightPrice(weightLimit, weight, heavy);
 
             return price;
         }
@@ -107,16 +107,24 @@ namespace FIrstAML.Lib
             return parcel.Price;
         }
 
-        private decimal CalculateWeightPrice(decimal weightLimit, decimal weight)
+        private decimal CalculateWeightPrice(decimal weightLimit, decimal weight, bool heavy)
         {
-            if(weight > weightLimit)
+            int dollarPerKg = 2;
+            if (heavy)
             {
-                return (weight - weightLimit) * 2;
+                weightLimit = 50;
+                dollarPerKg = 1;
+            }
+
+            if (weight > weightLimit)
+            {
+                return (weight - weightLimit) * dollarPerKg;
             }
             else
             {
                 return 0;
             }
+
         }
     }
 }
