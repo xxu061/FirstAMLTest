@@ -24,6 +24,18 @@ namespace FirstAM.UnitTest
             result.TotalPrice.Should().Be(8);
         }
 
+        [Fact]
+        public async Task ShouldCalculateTotalPriceForHeavyParcel()
+        {
+            IConfiguration config = GetConfig();
+            ParcelPriceCalculator calculator = new ParcelPriceCalculator(config);
+            Parcel parcel = new Parcel() { Width = 20, Height = 20, Length = 20, Weight = 2, Heavy = true };
+
+            var result = await calculator.HydrateParcelItem(parcel);
+
+            result.TotalPrice.Should().Be(58);
+        }
+
         private IConfiguration GetConfig()
         {
             var dictionary = new Dictionary<string, string>() {

@@ -115,22 +115,21 @@ namespace FIrstAML.Lib
 
         private decimal CalculateWeightPrice(decimal weightLimit, decimal weight, bool heavy)
         {
+            decimal result = 0; 
             int dollarPerKg = 2;
             if (heavy)
             {
+                result = 50;
                 weightLimit = 50;
                 dollarPerKg = 1;
             }
 
             if (weight > weightLimit)
             {
-                return (weight - weightLimit) * dollarPerKg;
-            }
-            else
-            {
-                return 0;
+                result += (weight - weightLimit) * dollarPerKg;
             }
 
+            return result;
         }
     }
 }
